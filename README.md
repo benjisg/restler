@@ -1,5 +1,10 @@
-Restler 0.2.0
+Rest in Node 0.1.0
 ===========
+
+This is mainly for my personal use. Use it if you want. I hope my changes could be put into Restler.
+
+Forked from: Restler 0.2.0
+--------
 
 (C) Dan Webb (dan@danwebb.net/@danwrong) 2011, Licensed under the MIT-LICENSE
 
