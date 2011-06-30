@@ -5,7 +5,7 @@ This is mainly for my personal use. Use it if you want. I hope my changes could 
 
 Changes to Restler include an encoding support at this point.
 
-To install (if you feel adventurous): ###npm install rest-in-node
+To install (if you feel adventurous): ### npm install rest-in-node
 
 Forked from: Restler 0.2.0
 --------
