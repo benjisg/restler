@@ -3,6 +3,10 @@ Rest in Node 0.1.0
 
 This is mainly for my personal use. Use it if you want. I hope my changes could be put into Restler.
 
+Changes to Restler include an encoding support at this point.
+
+To install (if you feel adventurous): ###npm install rest-in-node
+
 Forked from: Restler 0.2.0
 --------
 
