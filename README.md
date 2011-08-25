@@ -1,20 +1,8 @@
-Rest in Node 0.1.0
-===========
-
-This is mainly for my personal use. Use it if you want. I hope my changes could be put into Restler.
-
-Changes to Restler include an encoding support at this point.
-
-To install (if you feel adventurous): 
-npm install rest-in-node
-
-Forked from: Restler 0.2.0
---------
+## Restler 0.2.0
 
 (C) Dan Webb (dan@danwebb.net/@danwrong) 2011, Licensed under the MIT-LICENSE
 
 An HTTP client library for node.js (0.3 and up).  Hides most of the complexity of creating and using http.Client. Very early days yet.
-
 
 Features
 --------
@@ -30,14 +18,14 @@ Features
 * Deals with basic auth for you, just provide username and password options
 * Simple service wrapper that allows you to easily put together REST API libraries
     
-    
 API
 ---
 
-### request(url, options)
+### REQUESTS
 
-Basic method to make a request of any type.  The function returns a RestRequest object
-that emits events:
+**request(url, options)**
+
+Basic method to make a request of any type.  The function returns a RestRequest object that emits events:
 
 * _complete_ emitted when the request has finished whether it was successful or not.  Gets passed the response data and the response as arguments.
 * _success_ emitted when the request was successful.  Gets passed the response data and the response as arguments.
@@ -45,36 +33,38 @@ that emits events:
 * _2XX, 3XX, 4XX, 5XX etc_ emitted for all requests with response codes in the range.  Eg. 2XX emitted for 200, 201, 203
 * _actual response code_ there is an event emitted for every single response code.  eg.  404, 201, etc.
 
-### get(url, options)
+**get(url, options)**
 
 Create a GET request. 
 
-### post(url, options)
+**post(url, options)**
 
 Create a POST request.
 
-### put(url, options)
+**put(url, options)**
 
 Create a PUT request.
 
-### del(url, options)
+**del(url, options)**
 
 Create a DELETE request.
 
-### response parsers
+#### response parsers
 
 You can give any of these to the parsers option to specify how the response data is deserialized.
 
-#### parsers.auto
+**parsers.auto**
 
-Checks the content-type and then uses parsers.xml, parsers.json or parsers.yaml.  
-If the content type isn't recognised it just returns the data untouched.
+  Checks the content-type and then uses parsers.xml, parsers.json or parsers.yaml.  
+  If the content type isn't recognised it just returns the data untouched.
 
-#### parsers.json, parsers.xml, parsers.yaml
+**parsers.json**, **parsers.xml**, **parsers.yaml**
 
-All of these attempt to turn the response into a JavaScript object. In order to use the YAML and XML parsers you must have yaml and/or xml2js installed.
+  All of these attempt to turn the response into a JavaScript object. In order to use the YAML and XML parsers you must have yaml and/or xml2js installed.
 
-### options hash
+### OPTIONS
+  
+**options hash**
 
 * _method_ Request method, can be get, post, put, del
 * _query_ Query string variables as a javascript object, will override the querystring in the URL
@@ -88,63 +78,72 @@ All of these attempt to turn the response into a JavaScript object. In order to 
 * _client_ A http.Client instance if you want to reuse or implement some kind of connection pooling.
 * _followRedirects_ Does what it says on the tin.
 
+### RESPONSES
+
+EventEmitter responses come back as ordered:
+
+1. _error_ The error message returned, if any
+1. _data_ The parsed data; processed with the given parser in options
+1. _response_ The raw response object; useful for checking HTTP response codes with *response.statusCode*
+1. _body_ The raw response body; could possibly be a webpage depending on the service requested
 
 Example usage
 -------------
+```javascript
+	var sys = require('sys'),
+	      rest = require('./restler');
 
-    var sys = require('sys'),
-        rest = require('./restler');
+	rest.get('http://google.com').on('complete', function(error, data) {
+		sys.puts(data);
+	});
 
-    rest.get('http://google.com').on('complete', function(data) {
-      sys.puts(data);
-    });
+	rest.get('http://twaud.io/api/v1/users/danwrong.json').on('complete', function(error, data) {
+		sys.puts(data[0].message); // auto convert to object
+	});
 
-    rest.get('http://twaud.io/api/v1/users/danwrong.json').on('complete', function(data) {
-      sys.puts(data[0].message); // auto convert to object
-    });
-    
-    rest.get('http://twaud.io/api/v1/users/danwrong.xml').on('complete', function(data) {
-      sys.puts(data[0].sounds[0].sound[0].message); // auto convert to object
-    });
-    
-    rest.post('http://user:pass@service.com/action', {
-      data: { id: 334 },
-    }).on('complete', function(data, response) {
-      if (response.statusCode == 201) {
-        // you can get at the raw response like this...
-      }
-    });
-    
-    // multipart request sending a file and using https
-    rest.post('https://twaud.io/api/v1/upload.json', {
-      multipart: true,
-      username: 'danwrong',
-      password: 'wouldntyouliketoknow',
-      data: {
-        'sound[message]': 'hello from restler!',
-        'sound[file]': rest.file('doug-e-fresh_the-show.mp3', 'audio/mpeg')
-      }
-    }).on('complete', function(data) {
-      sys.puts(data.audio_url);
-    });
-    
-    // create a service constructor for very easy API wrappers a la HTTParty...
-    Twitter = rest.service(function(u, p) {
-      this.defaults.username = u;
-      this.defaults.password = p;
-    }, {
-      baseURL: 'http://twitter.com'
-    }, {
-      update: function(message) {
-        return this.post('/statuses/update.json', { data: { status: message } });
-      }
-    });
-    
-    var client = new Twitter('danwrong', 'password');
-    client.update('Tweeting using a Restler service thingy').on('complete', function(data) {
-      sys.p(data);
-    });
+	rest.get('http://twaud.io/api/v1/users/danwrong.xml').on('complete', function(error, data) {
+		sys.puts(data[0].sounds[0].sound[0].message); // auto convert to object
+	});
 
+	rest.post('http://user:pass@service.com/action', {
+		data: { id: 334 },
+	}).on('complete', function(error, data, response) {
+		if (response.statusCode == 201) {
+			// you can get at the raw response like this...
+		}
+	});
+
+	// multipart request sending a file and using https
+	rest.post('https://twaud.io/api/v1/upload.json', {
+		multipart: true,
+		username: 'danwrong',
+		password: 'wouldntyouliketoknow',
+		data: {
+			'sound[message]': 'hello from restler!',
+			'sound[file]': rest.file('doug-e-fresh_the-show.mp3', 'audio/mpeg')
+		}
+	}).on('complete', function(error, data) {
+		sys.puts(data.audio_url);
+	});
+
+	// create a service constructor for very easy API wrappers a la HTTParty...
+	Twitter = rest.service(function(u, p) {
+		this.defaults.username = u;
+		this.defaults.password = p;
+	}, {
+		baseURL: 'http://twitter.com'
+	}, {
+		update: function(message) {
+			return this.post('/statuses/update.json', { data: { status: message } });
+		}
+	});
+
+	var client = new Twitter('danwrong', 'password');
+	client.update('Tweeting using a Restler service thingy').on('complete', function(error, data) {
+		sys.p(data);
+	});
+	
+```
     
 Running the tests
 -----------------
