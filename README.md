@@ -4,6 +4,11 @@
 
 An HTTP client library for node.js (0.3 and up).  Hides most of the complexity of creating and using http.Client. Very early days yet.
 
+Dependencies
+-------------
++ npm package dependencies:
+  + iconv
+
 Features
 --------
 
